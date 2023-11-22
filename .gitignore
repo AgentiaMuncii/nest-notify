@@ -5,3 +5,4 @@ dist
 /pgdata/
 /ormlogs.log
 .env.backup
+.idea
