@@ -19,6 +19,7 @@ import {MessageContent} from '@/app/modules/message/entities/message-content.ent
 import {MessageSenderName} from '@/app/modules/message/entities/message-sender-name.entity';
 import {MessageReceiver} from '@/app/modules/message/entities/message-receiver.entity';
 import {ChannelService} from '@/app/modules/channel/channel.service';
+import {Language} from '@/app/enum/language.enum';
 
 @Injectable()
 export class MessageService {
@@ -73,20 +74,37 @@ export class MessageService {
     return addedMessage;
   }
 
+  private setLanguage(language: Language): string {
+    if(language === Language.EN) {
+      return 'EN';
+    }
+    if(language === Language.RO) {
+      return 'RO';
+    }
+    if(language === Language.RU) {
+      return 'RU';
+    }
+    return 'EN';
+  }
+
   async getUnread(
     options: IPaginationOptions,
-    sort_order: SortOrder,
-    sort_by: MessageSortColumn
+    language: Language
   ): Promise<Pagination<MessageGetResponseDto>> {
-
     try {
       const queryBuilder = this.messageRepository
         .createQueryBuilder('messages')
         .select('messages.id', '*')
         .select('messages.uuid', 'uuid')
-        .innerJoin(MessageReceiver, 'receiver', 'receiver.message_id = messages.id')
+        .innerJoin(MessageReceiver, 'receiver', 'receiver.message_id = messages.id AND receiver.viewed_at IS NULL')
         .addSelect('receiver.sent_at', 'sent_at')
-        .innerJoin(MessageContent, 'content', 'content.message_id = messages.id AND content.language = \'EN\'')
+        .addSelect('receiver.viewed_at', 'viewed_at')
+        .innerJoin(
+          MessageContent,
+          'content',
+          `content.message_id = messages.id AND content.language = '${this.setLanguage(language)}'`
+        )
+      //todo escape language
         .addSelect('content.subject', 'subject')
         .addSelect('content.body', 'body')
         .skip((Number(options.page) -1) * Number(options.limit))

@@ -20,6 +20,7 @@ import {MessageSortColumn} from '@/app/modules/message/validators/message-sort-c
 import {MessageGetResponseDto} from '@/app/modules/message/dto/message-get-response.dto';
 import {MessageUpdateResponseDto} from '@/app/modules/message/dto/message-update-response.dto';
 import {MessageUpdatePayloadDto} from '@/app/modules/message/dto/message-update-payload.dto';
+import {Language} from '@/app/enum/language.enum';
 
 @ApiTags('Messages')
 @Controller('/messages')
@@ -45,7 +46,7 @@ export class MessageController {
       .send(await this.messageService.create(messageCreatePayloadDto));
   }
 
-  @Get('for-receiver/:uuid')
+  @Get('receiver/:uuid/unread')
   @ApiOperation({ summary: 'Get list of new messages for a receiver' })
   @ApiQuery({
     name: 'page',
@@ -78,15 +79,13 @@ export class MessageController {
     isArray: true,
   })
 
-  async getNewForReceiver(
+  async getUnread(
       @Query('page', new DefaultValuePipe(1), ParseIntPipe)
         page: number,
       @Query('limit', new DefaultValuePipe(50), ParseIntPipe)
         limit: number,
-      @Query('sort_order', new DefaultValuePipe(SortOrder.DESC))
-        sort_order: SortOrder,
-      @Query('sort_by', new DefaultValuePipe(MessageSortColumn.id))
-        sort_by: MessageSortColumn,
+      @Query('language', new DefaultValuePipe(Language.EN))
+        language: Language,
       @Res() response: Response,
   ) {
     const paginatorConfig: PaginatorConfigInterface = {
@@ -95,9 +94,7 @@ export class MessageController {
     };
     response.status(HttpStatus.OK).json(
       await this.messageService.getUnread(
-        paginatorConfig,
-        sort_order,
-        sort_by
+        paginatorConfig, language
       ),
     );
   }
