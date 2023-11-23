@@ -94,7 +94,7 @@ export class MessageController {
       limit
     };
     response.status(HttpStatus.OK).json(
-      await this.messageService.getNewForReceiver(
+      await this.messageService.getUnread(
         paginatorConfig,
         sort_order,
         sort_by

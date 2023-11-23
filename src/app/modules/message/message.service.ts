@@ -8,7 +8,7 @@ import { Message} from './entities/message.entity';
 import { MessageCreatePayloadDto } from './dto/message-create-payload.dto';
 import { plainToInstance } from 'class-transformer';
 import { v4 as uuidv4 } from 'uuid';
-import {IPaginationOptions, paginate, Pagination} from 'nestjs-typeorm-paginate';
+import {IPaginationOptions, paginate, paginateRaw, Pagination} from 'nestjs-typeorm-paginate';
 import {SortOrder} from '@/database/validators/typeorm.sort.validator';
 import {MessageSortColumn} from '@/app/modules/message/validators/message-sort-column.validator';
 import {MessageCreateResponseDto} from '@/app/modules/message/dto/message-create-response.dto';
@@ -73,7 +73,7 @@ export class MessageService {
     return addedMessage;
   }
 
-  async getNewForReceiver(
+  async getUnread(
     options: IPaginationOptions,
     sort_order: SortOrder,
     sort_by: MessageSortColumn
@@ -82,26 +82,19 @@ export class MessageService {
     try {
       const queryBuilder = this.messageRepository
         .createQueryBuilder('messages')
-        //.innerJoinAndSelect(MessageReceiver, 'message_receivers', 'message_receivers.message_id = messages.id')
-        //.addSelect(['message_receivers.viewed_at'])
+        .select('messages.id', '*')
+        .select('messages.uuid', 'uuid')
+        .innerJoin(MessageReceiver, 'receiver', 'receiver.message_id = messages.id')
+        .addSelect('receiver.sent_at', 'sent_at')
+        .innerJoin(MessageContent, 'content', 'content.message_id = messages.id AND content.language = \'EN\'')
+        .addSelect('content.subject', 'subject')
+        .addSelect('content.body', 'body')
         .skip((Number(options.page) -1) * Number(options.limit))
+        .orderBy('receiver.sent_at', 'ASC')
         .take(Number(options.limit))
       ;
 
-
-      // console.log(
-      //   'TEST',
-      //   await this.messageRepository
-      //     .createQueryBuilder('messages')
-      //     .select(['messages.uuid', 'message_receivers.viewed_at'])
-      //     .innerJoinAndSelect(MessageReceiver, 'message_receivers', 'message_receivers.message_id = messages.id')
-      //     .addSelect(['message_receivers.viewed_at'])
-      //
-      //     .getRawMany()
-      // );
-      //console.log(await queryBuilder.getMany());
-      return await paginate<Message>(queryBuilder, options);
-      //return null;
+      return await paginateRaw(queryBuilder, options);
     } catch (e) {
       console.log(e);
       throw new NotFoundException();
