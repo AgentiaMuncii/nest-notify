@@ -1,6 +1,6 @@
 import {
   Column, CreateDateColumn,
-  Entity, OneToMany,
+  Entity, JoinColumn, OneToMany,
   PrimaryGeneratedColumn
 } from 'typeorm';
 import {MessageSenderName} from '@/app/modules/message/entities/message-sender-name.entity';
@@ -40,6 +40,7 @@ export class Message {
   @OneToMany(() =>  MessageContent, (messageContent) => messageContent.message_id)
     content: MessageContent[];
 
-  @OneToMany(() => MessageReceiver, (messageReceiver) => messageReceiver.message_id)
+  @OneToMany(() => MessageReceiver, (messageReceiver) => messageReceiver.message)
+  //@JoinColumn({name: 'receivers'})
     receivers: MessageReceiver[];
 }

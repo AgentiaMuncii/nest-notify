@@ -30,7 +30,7 @@ export class MessageReceiver {
 
     @ManyToOne(() => Message, (message) => message.receivers)
     @JoinColumn({name: 'message_id'})
-      message_entity: Message;
+      message: Message;
 
     @ManyToOne(() => Channel, (channel) => channel.id)
     @JoinColumn({name: 'channel_id'})

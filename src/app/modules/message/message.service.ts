@@ -57,7 +57,7 @@ export class MessageService {
           message_id: messageEntity.id,
           channel_id: await this.channelService.getIdByUuid(messageReceiver.channel_uuid),
           receiver_uuid: messageReceiver.uuid,
-          message_entity: null,
+          message: null,
           channel_entity: null,
         };
         await queryRunner.manager.save(MessageReceiver, messageReceiverEntity);
@@ -71,6 +71,41 @@ export class MessageService {
     }
 
     return addedMessage;
+  }
+
+  async getNewForReceiver(
+    options: IPaginationOptions,
+    sort_order: SortOrder,
+    sort_by: MessageSortColumn
+  ): Promise<Pagination<MessageGetResponseDto>> {
+
+    try {
+      const queryBuilder = this.messageRepository
+        .createQueryBuilder('messages')
+        //.innerJoinAndSelect(MessageReceiver, 'message_receivers', 'message_receivers.message_id = messages.id')
+        //.addSelect(['message_receivers.viewed_at'])
+        .skip((Number(options.page) -1) * Number(options.limit))
+        .take(Number(options.limit))
+      ;
+
+
+      // console.log(
+      //   'TEST',
+      //   await this.messageRepository
+      //     .createQueryBuilder('messages')
+      //     .select(['messages.uuid', 'message_receivers.viewed_at'])
+      //     .innerJoinAndSelect(MessageReceiver, 'message_receivers', 'message_receivers.message_id = messages.id')
+      //     .addSelect(['message_receivers.viewed_at'])
+      //
+      //     .getRawMany()
+      // );
+      //console.log(await queryBuilder.getMany());
+      return await paginate<Message>(queryBuilder, options);
+      //return null;
+    } catch (e) {
+      console.log(e);
+      throw new NotFoundException();
+    }
   }
 
   async getAllPaginated(

@@ -15,7 +15,7 @@ const config = {
   synchronize: false,
   logging: true,
   maxQueryExecutionTime: 1000,
-  logger: 'file',
+  // logger: 'file',
   extra: {
     poolSize: 20,
     connectionTimeoutMillis: 2000,

@@ -45,6 +45,63 @@ export class MessageController {
       .send(await this.messageService.create(messageCreatePayloadDto));
   }
 
+  @Get('for-receiver/:uuid')
+  @ApiOperation({ summary: 'Get list of new messages for a receiver' })
+  @ApiQuery({
+    name: 'page',
+    description: 'Page number',
+    type: 'number',
+    required: false,
+  })
+  @ApiQuery({
+    name: 'limit',
+    description: 'Page size',
+    type: 'number',
+    required: false,
+  })
+  @ApiQuery({
+    name: 'sort_order',
+    description: 'Sort order',
+    enum: SortOrder,
+    required: false,
+  })
+  @ApiQuery({
+    name: 'sort_by',
+    description: 'Sort column',
+    enum: MessageSortColumn,
+    required: false,
+  })
+
+  @ApiOkResponse({
+    description: 'List of messages',
+    type: MessageGetResponseDto,
+    isArray: true,
+  })
+
+  async getNewForReceiver(
+      @Query('page', new DefaultValuePipe(1), ParseIntPipe)
+        page: number,
+      @Query('limit', new DefaultValuePipe(50), ParseIntPipe)
+        limit: number,
+      @Query('sort_order', new DefaultValuePipe(SortOrder.DESC))
+        sort_order: SortOrder,
+      @Query('sort_by', new DefaultValuePipe(MessageSortColumn.id))
+        sort_by: MessageSortColumn,
+      @Res() response: Response,
+  ) {
+    const paginatorConfig: PaginatorConfigInterface = {
+      page,
+      limit
+    };
+    response.status(HttpStatus.OK).json(
+      await this.messageService.getNewForReceiver(
+        paginatorConfig,
+        sort_order,
+        sort_by
+      ),
+    );
+  }
+
   @Get('')
   @ApiOperation({ summary: 'Get list of messages' })
   @ApiQuery({
