@@ -3,7 +3,7 @@ import { ChannelType } from '@/app/modules/channel/enum/channel-type.enum';
 import {Exclude, Expose} from 'class-transformer';
 
 @Exclude()
-export class ChannelCreateResponseDto {
+export class MessageUpdateResponseDto {
   @ApiProperty({ example: 'Name', description: 'Name' })
   @Expose()
     name: string;

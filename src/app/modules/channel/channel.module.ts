@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ChannelController } from './channel.controller';
 import { ChannelService } from './channel.service';
-import { Channel } from './channel.entity';
+import { Channel } from './entities/channel.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import {ChannelSeedService} from '@/app/modules/channel/channel.seed.service';
 

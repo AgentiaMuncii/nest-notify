@@ -1,4 +1,4 @@
-export enum ChannelSort {
+export enum ChannelSortColumn {
   id = 'id',
   name = 'name',
 }

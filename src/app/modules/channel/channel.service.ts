@@ -4,17 +4,17 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Channel } from './channel.entity';
-import { ChannelCreatePayloadDto } from './dto/channel.create.payload.dto';
+import { Channel } from './entities/channel.entity';
+import { ChannelCreatePayloadDto } from './dto/channel-create-payload.dto';
 import { plainToInstance } from 'class-transformer';
-import {ChannelCreateResponseDto} from '@/app/modules/channel/dto/channel.create.response.dto';
+import {ChannelCreateResponseDto} from '@/app/modules/channel/dto/channel-create-response.dto';
 import { v4 as uuidv4 } from 'uuid';
 import {IPaginationOptions, paginate, Pagination} from 'nestjs-typeorm-paginate';
 import {SortOrder} from '@/database/validators/typeorm.sort.validator';
-import {ChannelSort} from '@/app/modules/channel/validators/channel.sort.validator';
-import {ChannelGetResponseDto} from '@/app/modules/channel/dto/channel.get.response.dto';
-import {ChannelUpdatePayloadDto} from '@/app/modules/channel/dto/channel.update.payload.dto';
-import {ChannelUpdateResponseDto} from '@/app/modules/channel/dto/channel.update.response.dto';
+import {ChannelSortColumn} from '@/app/modules/channel/validators/channel-sort-column.validator';
+import {ChannelGetResponseDto} from '@/app/modules/channel/dto/channel-get-response.dto';
+import {ChannelUpdatePayloadDto} from '@/app/modules/channel/dto/channel-update-payload.dto';
+import {ChannelUpdateResponseDto} from '@/app/modules/channel/dto/channel-update-response.dto';
 
 @Injectable()
 export class ChannelService {
@@ -28,7 +28,6 @@ export class ChannelService {
   ): Promise<ChannelCreateResponseDto> | undefined {
     const channelEntity = plainToInstance(Channel, channel);
     channelEntity.uuid = uuidv4();
-    console.log('entity', channelEntity);
     const existingChannel = await this.channelRepository.findOne({
       where: [{ name: channelEntity.name }],
     });
@@ -43,7 +42,7 @@ export class ChannelService {
   async getAllPaginated(
     options: IPaginationOptions,
     sort_order: SortOrder,
-    sort_by: ChannelSort
+    sort_by: ChannelSortColumn
   ): Promise<Pagination<ChannelGetResponseDto>> {
 
     try {
@@ -77,6 +76,17 @@ export class ChannelService {
     }
   }
 
+  async getIdByUuid(uuid: string): Promise<number> {
+    try {
+      const channel = await this.channelRepository.findOneOrFail({
+        where: [{ uuid }],
+      });
+      return channel.id;
+    } catch (e) {
+      throw new NotFoundException();
+    }
+  }
+
   async deleteByUuid(uuid: string): Promise<void> {
     try {
       await this.channelRepository.delete({
@@ -95,7 +105,7 @@ export class ChannelService {
         where: [{ uuid }],
       });
       await this.channelRepository.update(existingChannel, channelEntity);
-      return plainToInstance(ChannelCreateResponseDto, channelEntity);
+      return plainToInstance(ChannelUpdateResponseDto, channelEntity);
     } catch (e) {
       throw new NotFoundException();
     }

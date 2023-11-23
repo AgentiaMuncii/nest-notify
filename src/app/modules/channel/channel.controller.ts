@@ -12,13 +12,13 @@ import {
   ApiOperation, ApiParam, ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
-import { ChannelCreatePayloadDto } from '@/app/modules/channel/dto/channel.create.payload.dto';
+import { ChannelCreatePayloadDto } from '@/app/modules/channel/dto/channel-create-payload.dto';
 import {SortOrder} from '@/database/validators/typeorm.sort.validator';
-import {ChannelSort} from '@/app/modules/channel/validators/channel.sort.validator';
-import {ChannelGetResponseDto} from '@/app/modules/channel/dto/channel.get.response.dto';
+import {ChannelSortColumn} from '@/app/modules/channel/validators/channel-sort-column.validator';
+import {ChannelGetResponseDto} from '@/app/modules/channel/dto/channel-get-response.dto';
 import PaginatorConfigInterface from '@/database/interfaces/paginator-config.interface';
-import {ChannelUpdatePayloadDto} from '@/app/modules/channel/dto/channel.update.payload.dto';
-import {ChannelUpdateResponseDto} from '@/app/modules/channel/dto/channel.update.response.dto';
+import {ChannelUpdatePayloadDto} from '@/app/modules/channel/dto/channel-update-payload.dto';
+import {ChannelUpdateResponseDto} from '@/app/modules/channel/dto/channel-update-response.dto';
 
 @ApiTags('Channels')
 @Controller('/channels')
@@ -67,7 +67,7 @@ export class ChannelController {
   @ApiQuery({
     name: 'sort_by',
     description: 'Sort column',
-    enum: ChannelSort,
+    enum: ChannelSortColumn,
     required: false,
   })
   @ApiQuery({
@@ -94,8 +94,8 @@ export class ChannelController {
         limit: number,
       @Query('sort_order', new DefaultValuePipe(SortOrder.DESC))
         sort_order: SortOrder,
-      @Query('sort_by', new DefaultValuePipe(ChannelSort.id))
-        sort_by: ChannelSort,
+      @Query('sort_by', new DefaultValuePipe(ChannelSortColumn.id))
+        sort_by: ChannelSortColumn,
       @Res() response: Response,
   ) {
     const paginatorConfig: PaginatorConfigInterface = {
@@ -113,10 +113,10 @@ export class ChannelController {
 
   @Get(':uuid')
 
-  @ApiOperation({ summary: 'Get One Channel by Uuid' })
+  @ApiOperation({ summary: 'Get one Channel by Uuid' })
   @ApiParam({ name: 'uuid', description: 'Uuid', type: 'string'})
   @ApiOkResponse({
-    description: 'Country item',
+    description: 'Channel item',
     type: ChannelGetResponseDto,
     isArray: false,
   })

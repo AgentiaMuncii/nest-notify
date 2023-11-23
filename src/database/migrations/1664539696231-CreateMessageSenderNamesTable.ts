@@ -5,12 +5,21 @@ export class CreateMessageSenderNamesTable1664539696231 implements MigrationInte
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
-        name: 'messages_sender_names',
+        name: 'message_sender_names',
         columns: [
+          {
+            name: 'id',
+            type: 'int',
+            isPrimary: true,
+            isGenerated: true,
+            generationStrategy: 'increment',
+            isNullable: false,
+          },
           {
             name: 'message_id',
             type: 'int',
             isNullable: false,
+            isPrimary: true,
           },
           {
             name: 'name',
@@ -35,7 +44,7 @@ export class CreateMessageSenderNamesTable1664539696231 implements MigrationInte
     );
 
     await queryRunner.createForeignKey(
-      'messages_sender_names',
+      'message_sender_names',
       new TableForeignKey({
         name: 'message_sender_fk',
         columnNames: ['message_id'],
@@ -47,7 +56,7 @@ export class CreateMessageSenderNamesTable1664539696231 implements MigrationInte
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropTable('messages_sender_names');
-    await queryRunner.dropForeignKey('messages_sender_names', 'message_sender_fk');
+    await queryRunner.dropTable('message_sender_names');
+    await queryRunner.dropForeignKey('message_sender_names', 'message_sender_fk');
   }
 }

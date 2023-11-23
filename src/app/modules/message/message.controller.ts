@@ -6,46 +6,47 @@ import {
   Res,
 } from '@nestjs/common';
 import { Response } from 'express';
-import { ChannelService } from './channel.service';
+import { MessageService } from './message.service';
 import {
   ApiOkResponse,
   ApiOperation, ApiParam, ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
-import { ChannelCreatePayloadDto } from '@/app/modules/channel/dto/channel.create.payload.dto';
+
 import {SortOrder} from '@/database/validators/typeorm.sort.validator';
-import {ChannelSort} from '@/app/modules/channel/validators/channel.sort.validator';
-import {ChannelGetResponseDto} from '@/app/modules/channel/dto/channel.get.response.dto';
 import PaginatorConfigInterface from '@/database/interfaces/paginator-config.interface';
-import {ChannelUpdatePayloadDto} from '@/app/modules/channel/dto/channel.update.payload.dto';
-import {ChannelUpdateResponseDto} from '@/app/modules/channel/dto/channel.update.response.dto';
+import {MessageCreatePayloadDto} from '@/app/modules/message/dto/message-create-payload.dto';
+import {MessageSortColumn} from '@/app/modules/message/validators/message-sort-column.validator';
+import {MessageGetResponseDto} from '@/app/modules/message/dto/message-get-response.dto';
+import {MessageUpdateResponseDto} from '@/app/modules/message/dto/message-update-response.dto';
+import {MessageUpdatePayloadDto} from '@/app/modules/message/dto/message-update-payload.dto';
 
-@ApiTags('Channels')
-@Controller('/channels')
+@ApiTags('Messages')
+@Controller('/messages')
 
-export class ChannelController {
+export class MessageController {
   constructor(
-    private readonly channelService: ChannelService
+    private readonly messageService: MessageService
   ) {}
 
   @Post()
-  @ApiOperation({ summary: 'Create a new channel' })
+  @ApiOperation({ summary: 'Create a new message' })
   @ApiOkResponse({
-    description: 'Added channel',
-    type: ChannelCreatePayloadDto,
+    description: 'Message created',
+    type: MessageCreatePayloadDto,
     isArray: true,
   })
   async create(
-    @Body() createChannelDto: ChannelCreatePayloadDto,
+    @Body() messageCreatePayloadDto: MessageCreatePayloadDto,
     @Res() response: Response,
   ) {
     response
       .status(HttpStatus.OK)
-      .send(await this.channelService.create(createChannelDto));
+      .send(await this.messageService.create(messageCreatePayloadDto));
   }
 
   @Get('')
-  @ApiOperation({ summary: 'Get list of channels' })
+  @ApiOperation({ summary: 'Get list of messages' })
   @ApiQuery({
     name: 'page',
     description: 'Page number',
@@ -67,24 +68,13 @@ export class ChannelController {
   @ApiQuery({
     name: 'sort_by',
     description: 'Sort column',
-    enum: ChannelSort,
+    enum: MessageSortColumn,
     required: false,
   })
-  @ApiQuery({
-    name: 'filter[name]',
-    description: 'Filter by name',
-    type: 'string',
-    required: false,
-  })
-  @ApiQuery({
-    name: 'filter[type]',
-    description: 'Filter by type',
-    type: 'string',
-    required: false,
-  })
+
   @ApiOkResponse({
-    description: 'List of channels',
-    type: ChannelGetResponseDto,
+    description: 'List of messages',
+    type: MessageGetResponseDto,
     isArray: true,
   })
   async getAllPaginated(
@@ -94,8 +84,8 @@ export class ChannelController {
         limit: number,
       @Query('sort_order', new DefaultValuePipe(SortOrder.DESC))
         sort_order: SortOrder,
-      @Query('sort_by', new DefaultValuePipe(ChannelSort.id))
-        sort_by: ChannelSort,
+      @Query('sort_by', new DefaultValuePipe(MessageSortColumn.id))
+        sort_by: MessageSortColumn,
       @Res() response: Response,
   ) {
     const paginatorConfig: PaginatorConfigInterface = {
@@ -103,7 +93,7 @@ export class ChannelController {
       limit
     };
     response.status(HttpStatus.OK).json(
-      await this.channelService.getAllPaginated(
+      await this.messageService.getAllPaginated(
         paginatorConfig,
         sort_order,
         sort_by
@@ -113,11 +103,11 @@ export class ChannelController {
 
   @Get(':uuid')
 
-  @ApiOperation({ summary: 'Get One Channel by Uuid' })
+  @ApiOperation({ summary: 'Get one message by Uuid' })
   @ApiParam({ name: 'uuid', description: 'Uuid', type: 'string'})
   @ApiOkResponse({
-    description: 'Country item',
-    type: ChannelGetResponseDto,
+    description: 'Message item',
+    type: MessageGetResponseDto,
     isArray: false,
   })
   async getOneById(
@@ -126,12 +116,12 @@ export class ChannelController {
   ) {
     response
       .status(HttpStatus.OK)
-      .send(await this.channelService.getOneByUuid(uuid));
+      .send(await this.messageService.getOneByUuid(uuid));
   }
 
   @Delete(':uuid')
-  @ApiOperation({ summary: 'Delete a channel by uuid' })
-  @ApiParam({ name: 'uuid', description: 'Channel uuid', type: 'string' })
+  @ApiOperation({ summary: 'Delete a message by uuid' })
+  @ApiParam({ name: 'uuid', description: 'Message uuid', type: 'string' })
   @ApiOkResponse({
     description: 'Empty response',
     type: null,
@@ -142,26 +132,26 @@ export class ChannelController {
   ) {
     response
       .status(HttpStatus.OK)
-      .send(await this.channelService.deleteByUuid(uuid));
+      .send(await this.messageService.deleteByUuid(uuid));
   }
 
   @Patch(':uuid')
-  @ApiOperation({ summary: 'Update a channel by uuid' })
-  @ApiParam({ name: 'uuid', description: 'Channel id', type: 'string' })
+  @ApiOperation({ summary: 'Update a message by uuid' })
+  @ApiParam({ name: 'uuid', description: 'Message id', type: 'string' })
   @ApiOkResponse({
-    description: 'Updated channel',
-    type: ChannelUpdateResponseDto,
+    description: 'Updated message',
+    type: MessageUpdateResponseDto,
     isArray: true,
   })
   async update(
-      @Body() updateChannelDto: ChannelUpdatePayloadDto,
+      @Body() updateMessageDto: MessageUpdatePayloadDto,
       @Param('uuid', ParseUUIDPipe) uuid: string,
       @Res() response: Response,
   ) {
     response
       .status(HttpStatus.OK)
       .send(
-        await this.channelService.updateByUuid(uuid, updateChannelDto),
+        await this.messageService.updateByUuid(uuid, updateMessageDto),
       );
   }
 }

@@ -8,9 +8,18 @@ export class CreateMessageReceiversTable1664539696233 implements MigrationInterf
         name: 'message_receivers',
         columns: [
           {
+            name: 'id',
+            type: 'int',
+            isPrimary: true,
+            isGenerated: true,
+            generationStrategy: 'increment',
+            isNullable: false,
+          },
+          {
             name: 'message_id',
             type: 'int',
             isNullable: false,
+            isPrimary: true,
           },
           {
             name: 'receiver_uuid',
@@ -26,18 +35,18 @@ export class CreateMessageReceiversTable1664539696233 implements MigrationInterf
           {
             name: 'sent_at',
             type: 'timestamp',
-            isNullable: true,
+            isNullable: false,
             default: 'CURRENT_TIMESTAMP',
           },
           {
             name: 'viewed_at',
             type: 'timestamp',
-            isNullable: false
+            isNullable: true
           },
           {
-            name: 'mark_as_read_at',
+            name: 'confirm_view_at',
             type: 'timestamp',
-            isNullable: false
+            isNullable: true
           }
         ],
       }),

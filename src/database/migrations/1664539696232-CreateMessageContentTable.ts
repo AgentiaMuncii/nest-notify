@@ -8,9 +8,18 @@ export class CreateMessageContentTable1664539696232 implements MigrationInterfac
         name: 'message_content',
         columns: [
           {
+            name: 'id',
+            type: 'int',
+            isPrimary: true,
+            isGenerated: true,
+            generationStrategy: 'increment',
+            isNullable: false,
+          },
+          {
             name: 'message_id',
             type: 'int',
             isNullable: false,
+            isPrimary: true,
           },
           {
             name: 'language',
@@ -30,7 +39,7 @@ export class CreateMessageContentTable1664539696232 implements MigrationInterfac
             isNullable: false,
           },
           {
-            name: 'message',
+            name: 'body',
             type: 'varchar',
             length: '1000',
             isNullable: false,

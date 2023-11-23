@@ -4,7 +4,7 @@ import {
 } from '@nestjs/common';
 import { ChannelService } from '@/app/modules/channel/channel.service';
 import channels from '@/database/seeds-data/channels.json';
-import {ChannelCreatePayloadDto} from '@/app/modules/channel/dto/channel.create.payload.dto';
+import {ChannelCreatePayloadDto} from '@/app/modules/channel/dto/channel-create-payload.dto';
 import {ChannelType} from '@/app/modules/channel/enum/channel-type.enum';
 
 @Injectable()
