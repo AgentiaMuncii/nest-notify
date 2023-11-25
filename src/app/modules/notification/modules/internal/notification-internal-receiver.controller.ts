@@ -1,8 +1,7 @@
 import {
-  Body,
-  Controller, DefaultValuePipe, Delete, Get,
+  Controller, DefaultValuePipe, Get,
   HttpStatus, Param, ParseIntPipe, ParseUUIDPipe,
-  Post, Query,
+  Query,
   Res,
 } from '@nestjs/common';
 import { Response } from 'express';
@@ -12,125 +11,20 @@ import {
   ApiOperation, ApiParam, ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
-
-import {SortOrder} from '@/database/validators/typeorm.sort.validator';
 import PaginatorConfigInterface from '@/database/interfaces/paginator-config.interface';
-import {NotificationCreatePayloadDto} from '@/app/modules/notification/modules/internal/dto/notification-create-payload.dto';
-import {NotificationSortColumn} from '@/app/modules/notification/modules/internal/validators/message-sort-column.validator';
 import {NotificationGetResponseDto} from '@/app/modules/notification/modules/internal/dto/notification-get-response.dto';
 import {Language} from '@/app/enum/language.enum';
 
-@ApiTags('Notifications')
-@Controller('notifications/internal')
+@ApiTags('Notifications Internal Receiver')
+@Controller('notifications/internal/own')
 
-export class NotificationInternalController {
+export class NotificationInternalReceiverController {
   constructor(
     private readonly messageService: NotificationInternalService
   ) {}
 
-  @Post()
-  @ApiOperation({ summary: 'Create a new notification internal' })
-  @ApiOkResponse({
-    description: 'Created notification',
-    type: NotificationCreatePayloadDto,
-    isArray: true,
-  })
-  async create(
-    @Body() notificationCreatePayloadDto: NotificationCreatePayloadDto,
-    @Res() response: Response,
-  ) {
-    response
-      .status(HttpStatus.OK)
-      .send(await this.messageService.create(notificationCreatePayloadDto));
-  }
-
-  @Get('')
-  @ApiOperation({ summary: 'Get list of notifications' })
-  @ApiQuery({
-    name: 'page',
-    description: 'Page number',
-    type: 'number',
-    required: false,
-  })
-  @ApiQuery({
-    name: 'limit',
-    description: 'Page size',
-    type: 'number',
-    required: false,
-  })
-  @ApiQuery({
-    name: 'sort_order',
-    description: 'Sort order',
-    enum: SortOrder,
-    required: false,
-  })
-  @ApiQuery({
-    name: 'sort_by',
-    description: 'Sort column',
-    enum: NotificationSortColumn,
-    required: false,
-  })
-
-  @ApiOkResponse({
-    description: 'List of notifications',
-    type: NotificationGetResponseDto,
-    isArray: true,
-  })
-  async getAllPaginated(
-      @Query('page', new DefaultValuePipe(1), ParseIntPipe)
-        page: number,
-      @Query('limit', new DefaultValuePipe(50), ParseIntPipe)
-        limit: number,
-      @Res() response: Response,
-  ) {
-    const paginatorConfig: PaginatorConfigInterface = {
-      page,
-      limit
-    };
-    response.status(HttpStatus.OK).json(
-      await this.messageService.getAllPaginated(
-        paginatorConfig
-      ),
-    );
-  }
-
-  @Get(':uuid')
-
-  @ApiOperation({ summary: 'Get one internal notification by Uuid' })
-  @ApiParam({ name: 'uuid', description: 'Uuid', type: 'string'})
-  @ApiOkResponse({
-    description: 'Notification item',
-    type: NotificationGetResponseDto,
-    isArray: false,
-  })
-  async getOneById(
-      @Param('uuid', ParseUUIDPipe) uuid: string,
-      @Res() response: Response,
-  ) {
-    response
-      .status(HttpStatus.OK)
-      .send(await this.messageService.getOne(uuid));
-  }
-
-  @Delete(':uuid')
-  @ApiOperation({ summary: 'Delete a notification by uuid' })
-  @ApiParam({ name: 'uuid', description: 'Notification uuid', type: 'string' })
-  @ApiOkResponse({
-    description: 'Empty response',
-    type: null,
-  })
-  async delete(
-      @Param('uuid', ParseUUIDPipe) uuid: string,
-      @Res() response: Response,
-  ) {
-    response
-      .status(HttpStatus.OK)
-      .send(await this.messageService.delete(uuid));
-  }
-
-
-  @Get('own/:receiver_uuid')
-  @ApiOperation({ summary: 'Get list of notifications for a specified receiver' })
+  @Get(':receiver_uuid')
+  @ApiOperation({ summary: 'Get all own receiver internal notifications' })
   @ApiParam({ name: 'receiver_uuid', description: 'Receiver uuid', type: 'string' })
   @ApiQuery({
     name: 'page',
@@ -144,7 +38,6 @@ export class NotificationInternalController {
     type: 'number',
     required: false,
   })
-
   @ApiOkResponse({
     description: 'List of notifications',
     type: NotificationGetResponseDto,
@@ -173,8 +66,8 @@ export class NotificationInternalController {
     );
   }
 
-  @Get('own/:receiver_uuid/unread')
-  @ApiOperation({ summary: 'Get list of notifications for a specified receiver' })
+  @Get(':receiver_uuid/unread')
+  @ApiOperation({ summary: 'Get unread own receiver internal notifications' })
   @ApiParam({ name: 'receiver_uuid', description: 'Receiver uuid', type: 'string' })
   @ApiQuery({
     name: 'page',
@@ -217,13 +110,12 @@ export class NotificationInternalController {
     );
   }
 
-  @Get('own/:receiver_uuid/notifications/:notification_uuid')
-  @ApiOperation({ summary: 'Get list of notifications for a specified receiver' })
+  @Get(':receiver_uuid/notifications/:notification_uuid')
+  @ApiOperation({ summary: 'Get a specified internal notification for a receiver' })
   @ApiParam({ name: 'receiver_uuid', description: 'Receiver uuid', type: 'string' })
   @ApiParam({ name: 'notification_uuid', description: 'Notification uuid', type: 'string' })
-
   @ApiOkResponse({
-    description: 'List of notifications',
+    description: 'Notification details',
     type: NotificationGetResponseDto,
     isArray: true,
   })
@@ -243,13 +135,12 @@ export class NotificationInternalController {
     );
   }
 
-  @Get('own/:receiver_uuid/notifications/:notification_uuid/confirm-read')
-  @ApiOperation({ summary: 'Get list of notifications for a specified receiver' })
+  @Get(':receiver_uuid/notifications/:notification_uuid/confirm-read')
+  @ApiOperation({ summary: 'Confirmation about read of specific notification by a receiver' })
   @ApiParam({ name: 'receiver_uuid', description: 'Receiver uuid', type: 'string' })
   @ApiParam({ name: 'notification_uuid', description: 'Notification uuid', type: 'string' })
-
   @ApiOkResponse({
-    description: 'List of notifications',
+    description: 'Uuid of confirmed notification',
     type: NotificationGetResponseDto,
     isArray: true,
   })
@@ -266,12 +157,12 @@ export class NotificationInternalController {
     );
   }
 
-  @Get('own/:receiver_uuid/unread-count')
-  @ApiOperation({ summary: 'Get list of notifications for a specified receiver' })
+  @Get(':receiver_uuid/unread-count')
+  @ApiOperation({ summary: 'Amount of unread notification and datetime of last added notification' })
   @ApiParam({ name: 'receiver_uuid', description: 'Receiver uuid', type: 'string' })
 
   @ApiOkResponse({
-    description: 'List of notifications',
+    description: 'Amount of unread notification and datetime of last added notification',
     type: NotificationGetResponseDto,
     isArray: true,
   })
