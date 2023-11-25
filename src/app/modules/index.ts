@@ -1,7 +1,5 @@
-import {ChannelModule} from '@/app/modules/channel/channel.module';
-import {MessageModule} from '@/app/modules/message/message.module';
+import {NotificationInternalModule} from '@/app/modules/notification/modules/internal/notification-internal.module';
 
 export default [
-  ChannelModule,
-  MessageModule
+  NotificationInternalModule
 ];

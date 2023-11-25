@@ -2,7 +2,7 @@ version: '3.9'
 
 services:
   postgres:
-    container_name: nest-notify-db
+    container_name: nest-notification-db
     image: postgres:latest
     ports:
       - 5432:5432
@@ -19,7 +19,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: nest-notify-app
+    container_name: nest-notification-app
     ports:
       - '3000:3000'
     depends_on:

@@ -11,7 +11,7 @@ export default EventEmitterModule.forRoot({
   removeListener: false,
   // the maximum amount of listeners that can be assigned to an event
   maxListeners: 10,
-  // show event name in memory leak message when more than maximum amount of listeners is assigned
+  // show event name in memory leak internal when more than maximum amount of listeners is assigned
   verboseMemoryLeak: false,
   // disable throwing uncaughtException if an error event is emitted and it has no listeners
   ignoreErrors: false,
