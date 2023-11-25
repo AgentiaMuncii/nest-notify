@@ -21,6 +21,24 @@ export class NotificationReceiver {
     })
       receiver_uuid: string;
 
+    @Column({
+      type: 'timestamp',
+      nullable: true,
+    })
+      sent_at: Date;
+
+    @Column({
+      type: 'timestamp',
+      nullable: true,
+    })
+      viewed_at: Date;
+
+    @Column({
+      type: 'timestamp',
+      nullable: true,
+    })
+      confirm_view_at: Date;
+
     @ManyToOne(() => Notification, (notification) => notification.receivers)
     @JoinColumn({name: 'notification_id'})
       notification: Notification;
