@@ -16,6 +16,7 @@ import {
   NotificationGetOneResponseDto
 } from '@/app/modules/notification/modules/internal/dto/notification-get-one-response.dto';
 import {ChannelType} from '@/app/modules/notification/enum/channel-type.enum';
+import {EventEmitter2} from '@nestjs/event-emitter';
 
 @Injectable()
 export class NotificationInternalService {
@@ -25,7 +26,7 @@ export class NotificationInternalService {
     @InjectRepository(NotificationReceiver)
     private readonly notificationReceiverRepository: Repository<NotificationReceiver>,
     private readonly dateSource: DataSource,
-
+    private readonly eventEmitter: EventEmitter2
   ) {}
 
   async create(
@@ -61,6 +62,12 @@ export class NotificationInternalService {
       }
 
       await queryRunner.commitTransaction();
+
+      this.eventEmitter.emit('notification.internal.created', {
+        receivers: notification.receivers,
+        subject: notificationEntity.content[0].subject,
+      });
+
     } catch (e) {
       await queryRunner.rollbackTransaction();
     } finally {

@@ -23,7 +23,8 @@ async function bootstrap() {
   app.enableVersioning({
     type: VersioningType.URI,
   });
-  await app.listen(3000);
+  app.enableCors();
+  await app.listen(AppConfig.app.port);
 }
 
 (async () => {
