@@ -1,7 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {IsArray, Length} from 'class-validator';
 import {Language} from '@/app/enum/language.enum';
-import {string} from 'yargs';
 
 export class NotificationContentDto {
     @ApiProperty({ example: 'en', description: 'Language' })
@@ -30,8 +29,7 @@ export class NotificationCreatePayloadDto {
   @ApiProperty({
     example: '',
     description: 'Notification receivers',
-    name: 'receivers',
-    type: string
+    name: 'receivers'
   })
   @IsArray()
     receivers: string[];

@@ -5,6 +5,7 @@ import {OnEvent} from '@nestjs/event-emitter';
 interface INotificationInternalCreatedEvent{
   receivers: string[];
   subject: string;
+  uuid: string;
 }
 @Controller('/notification-internal-events')
 export class NotificationInternalEventsController {
@@ -17,7 +18,8 @@ export class NotificationInternalEventsController {
     for (const notificationReceiver of notification.receivers){
       this.eventsGateway.server.emit('notification.internal.created', {
         receiver: notificationReceiver,
-        subject: notification.subject
+        subject: notification.subject,
+        uuid: notification.uuid,
       });
     }
   }

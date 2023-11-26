@@ -66,6 +66,7 @@ export class NotificationInternalService {
       this.eventEmitter.emit('notification.internal.created', {
         receivers: notification.receivers,
         subject: notificationEntity.content[0].subject,
+        uuid: notificationEntity.uuid,
       });
 
     } catch (e) {
@@ -199,7 +200,7 @@ export class NotificationInternalService {
       const notification = await this.notificationRepository
         .createQueryBuilder('notifications')
         .select('notifications.uuid', 'uuid')
-        .leftJoin(
+        .innerJoin(
           NotificationContent,
           'content',
           'content.notification_id = notifications.id AND content.language = :language',
@@ -208,7 +209,7 @@ export class NotificationInternalService {
         .addSelect('content.notification_id', 'notification_id')
         .addSelect('content.subject', 'subject')
         .addSelect('content.body', 'body')
-        .leftJoin(
+        .innerJoin(
           NotificationReceiver,
           'receiver',
           'receiver.notification_id = notifications.id AND receiver.receiver_uuid = :receiver_uuid',
@@ -220,7 +221,7 @@ export class NotificationInternalService {
         .getRawOne()
       ;
 
-      //console.log(notification);
+      console.log(notification);
 
       const notificationReceiver = await this.notificationReceiverRepository.findOne(
         {

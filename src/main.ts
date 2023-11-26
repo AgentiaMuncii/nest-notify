@@ -17,8 +17,8 @@ async function bootstrap() {
   }
 
   app.useGlobalPipes(new ValidationPipe({
-    whitelist: true,
-    forbidNonWhitelisted: true,
+    // whitelist: true,
+    // forbidNonWhitelisted: true,
   }));
   app.enableVersioning({
     type: VersioningType.URI,
@@ -27,12 +27,4 @@ async function bootstrap() {
   await app.listen(AppConfig.app.port);
 }
 
-(async () => {
-  console.log('App bootstrap started');
-  try {
-    await bootstrap();
-  }catch (e) {
-    console.log(e);
-  }
-  console.log('App bootstrap finished');
-})();
+bootstrap();
