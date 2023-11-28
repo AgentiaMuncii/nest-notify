@@ -6,3 +6,4 @@ dist
 /ormlogs.log
 .env.backup
 .idea
+.env

@@ -15,19 +15,19 @@ services:
     networks:
       - nest-notify
 
-  app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: nest-notification-app
-    ports:
-      - '3000:3000'
-    depends_on:
-      - postgres
-    volumes:
-      - ./src:/app/src
-    networks:
-      - nest-notify
+#  app:
+#    build:
+#      context: .
+#      dockerfile: Dockerfile
+#    container_name: nest-notification-app
+#    ports:
+#      - '3000:3000'
+#    depends_on:
+#      - postgres
+#    volumes:
+#      - ./src:/app/src
+#    networks:
+#      - nest-notify
 volumes:
   postgres-data:
 

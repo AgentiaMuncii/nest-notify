@@ -80,6 +80,9 @@ class AppConfigSingleton {
       admin_username: null,
       admin_email: null,
       admin_password: null
+    },
+    telegram: {
+      botToken: null
     }
   };
 

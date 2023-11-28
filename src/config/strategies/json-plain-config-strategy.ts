@@ -68,6 +68,9 @@ export default class JsonPlainConfigStrategy {
         admin_username: jsonPlainConfig.appInstall.admin_username,
         admin_email: jsonPlainConfig.appInstall.admin_email,
         admin_password: jsonPlainConfig.appInstall.admin_password
+      },
+      telegram:{
+        botToken: jsonPlainConfig.telegram.botToken
       }
     };
     this.config.db.url = generateDatabaseUrl(this.config.db);

@@ -70,6 +70,9 @@ export default class EnvConfigStrategy {
         admin_username: process.env.APP_INSTALL_ADMIN_USERNAME,
         admin_email: process.env.APP_INSTALL_ADMIN_EMAIL,
         admin_password: process.env.APP_INSTALL_ADMIN_PASSWORD
+      },
+      telegram:{
+        botToken: process.env.TELEGRAM_BOT_TOKEN
       }
     };
 

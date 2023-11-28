@@ -57,5 +57,8 @@
     "admin_username": "root",
     "admin_email": "root@domain.com",
     "admin_password": "123456789!0Ab"
+  },
+  "telegram": {
+    "botToken": "1234567890:ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
   }
 }
