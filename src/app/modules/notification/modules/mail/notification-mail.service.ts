@@ -1,0 +1,85 @@
+import {Injectable} from '@nestjs/common';
+import {
+  MailNotificationCreatePayloadDto
+} from '@/app/modules/notification/modules/mail/dto/mail-notification-create-payload.dto';
+import {InjectRepository} from '@nestjs/typeorm';
+import {DataSource, IsNull, LessThan, Repository} from 'typeorm';
+import {MailNotification} from '@/app/modules/notification/modules/mail/entities/mail-notification.entity';
+import {Cron} from '@nestjs/schedule';
+import {MailerService} from '@nestjs-modules/mailer';
+import AppConfig from '@/config/app-config';
+
+@Injectable()
+export class NotificationMailService {
+  
+  constructor(
+      @InjectRepository(MailNotification)
+      private readonly notificationRepository: Repository<MailNotification>,
+      private readonly dateSource: DataSource,
+      private readonly mailerService: MailerService
+  ) {
+  }
+  async createNotification(notification: MailNotificationCreatePayloadDto) {
+    const createdNotifications = [];
+    const queryRunner = this.dateSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      for (const email of notification.receivers) {
+        const newNotification = new MailNotification();
+        newNotification.receiver_email = email;
+        newNotification.subject = notification.subject;
+        newNotification.body = notification.body;
+        createdNotifications.push(await queryRunner.manager.save(newNotification));
+      }
+      await queryRunner.commitTransaction();
+    } catch (err) {
+      await queryRunner.rollbackTransaction();
+    } finally {
+      await queryRunner.release();
+    }
+    return createdNotifications;
+  }
+
+  private async getUnsentNotifications() {
+    return this.notificationRepository.find({
+      where: {
+        sent_at: IsNull(),
+        retry_attempts: LessThan(AppConfig.mail.retryAttempts)
+      },
+      order: {
+        created_at: 'ASC',
+      },
+      take: 1
+    });
+  }
+
+  @Cron(AppConfig.mail.cronTimeout)
+  async sendNotification() {
+    console.log('sendNotification', new Date().toISOString());
+    const sentNotifications = [];
+
+    try {
+      const notificationsToBeSent = await this.getUnsentNotifications();
+      for (const mailNotification of notificationsToBeSent) {
+        mailNotification.sent_at = new Date();
+        mailNotification.retry_attempts += 1;
+
+        const sendResponse = await this.mailerService.sendMail({
+          to: mailNotification.receiver_email,
+          subject: mailNotification.subject,
+          text: mailNotification.body,
+          html: mailNotification.body
+        });
+
+        console.log('sendResponse', sendResponse);
+
+        await this.notificationRepository.save(mailNotification);
+        sentNotifications.push(mailNotification);
+      }
+      return sentNotifications;
+    } catch (err) {
+      console.log(err);
+    }
+  }
+}

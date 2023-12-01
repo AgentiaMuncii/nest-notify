@@ -7,6 +7,7 @@ import FilesConfigInterface from './components/files-config.interface';
 import MongodbConfigInterface from './components/mongodb-config.interface';
 import RedisConfigInterface from './components/redis-config.interface';
 import TelegramConfigInterface from './components/telegram-config.interface';
+import MailConfigInterface from '@/config/interfaces/components/mail-config.interface';
 
 export default interface ConfigInterface{
     app: AppConfigInterface
@@ -18,4 +19,5 @@ export default interface ConfigInterface{
     docs: DocsConfigInterface
     appInstall: AppInstallInterface
     telegram: TelegramConfigInterface
+    mail: MailConfigInterface
 }

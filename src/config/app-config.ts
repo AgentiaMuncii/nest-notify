@@ -83,6 +83,18 @@ class AppConfigSingleton {
     },
     telegram: {
       botToken: null
+    },
+    mail: {
+      mailer: null,
+      host: null,
+      port: null,
+      username: null,
+      password: null,
+      encryption: null,
+      fromAddress: null,
+      fromName: null,
+      retryAttempts: null,
+      cronTimeout: null
     }
   };
 

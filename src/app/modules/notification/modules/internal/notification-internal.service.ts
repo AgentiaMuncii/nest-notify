@@ -309,8 +309,6 @@ export class NotificationInternalService {
     }
   }
 
-
-
   private setLanguage(language: Language): string {
     if(language === Language.EN) {
       return 'EN';

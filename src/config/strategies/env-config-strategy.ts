@@ -73,6 +73,18 @@ export default class EnvConfigStrategy {
       },
       telegram:{
         botToken: process.env.TELEGRAM_BOT_TOKEN
+      },
+      mail: {
+        mailer: process.env.MAIL_MAILER,
+        host: process.env.MAIL_HOST,
+        port: Number(process.env.MAIL_PORT),
+        username: process.env.MAIL_USERNAME,
+        password: process.env.MAIL_PASSWORD,
+        encryption: process.env.MAIL_ENCRYPTION,
+        fromAddress: process.env.MAIL_FROM_ADDRESS,
+        fromName: process.env.MAIL_FROM_NAME,
+        retryAttempts: Number(process.env.MAIL_RETRY_ATTEMPTS),
+        cronTimeout: process.env.MAIL_CRON_TIMEOUT
       }
     };
 

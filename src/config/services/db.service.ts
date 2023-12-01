@@ -22,9 +22,6 @@ export function generateDatabaseUrl (dbConfig: any) {
   if(dbConfig.name.schema){
     urlParts.push(`?schema=${dbConfig.name.schema}`);
   }
-  console.log('*****');
-  console.log(urlParts.join(''));
-  console.log('*****');
   return urlParts.join('');
 }
 

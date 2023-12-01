@@ -71,6 +71,18 @@ export default class JsonPlainConfigStrategy {
       },
       telegram:{
         botToken: jsonPlainConfig.telegram.botToken
+      },
+      mail: {
+        mailer: jsonPlainConfig.mail.mailer,
+        host: jsonPlainConfig.mail.host,
+        port: jsonPlainConfig.mail.port,
+        username: jsonPlainConfig.mail.username,
+        password: jsonPlainConfig.mail.password,
+        encryption: jsonPlainConfig.mail.encryption,
+        fromAddress: jsonPlainConfig.mail.fromAddress,
+        fromName: jsonPlainConfig.mail.fromName,
+        retryAttempts: Number(jsonPlainConfig.mail.retryAttempts),
+        cronTimeout: jsonPlainConfig.mail.cronTimeout
       }
     };
     this.config.db.url = generateDatabaseUrl(this.config.db);

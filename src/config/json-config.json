@@ -60,5 +60,17 @@
   },
   "telegram": {
     "botToken": "1234567890:ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
+  },
+  "mail": {
+    "mailer": null,
+    "host": null,
+    "port": null,
+    "username": null,
+    "password": null,
+    "encryption": null,
+    "fromAddress": null,
+    "fromName": null,
+    "retryAttempts": null,
+    "cronTimeout": null
   }
 }
