@@ -8,7 +8,7 @@ interface INotificationInternalCreatedEvent{
   uuid: string;
 }
 @Controller('/notification-internal-events')
-export class NotificationInternalEventsController {
+export class InternalNotificationEventsController {
   constructor(
       private readonly eventsGateway: EventsGateway
   ){}

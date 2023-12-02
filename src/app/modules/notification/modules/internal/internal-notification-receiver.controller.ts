@@ -5,7 +5,7 @@ import {
   Res,
 } from '@nestjs/common';
 import { Response } from 'express';
-import { NotificationInternalService } from './notification-internal.service';
+import { InternalNotificationService } from './internal-notification.service';
 import {
   ApiOkResponse,
   ApiOperation, ApiParam, ApiQuery,
@@ -18,9 +18,9 @@ import {Language} from '@/app/enum/language.enum';
 @ApiTags('Notifications Internal Receiver')
 @Controller('notifications/internal/own')
 
-export class NotificationInternalReceiverController {
+export class InternalNotificationReceiverController {
   constructor(
-    private readonly messageService: NotificationInternalService
+    private readonly messageService: InternalNotificationService
   ) {}
 
   @Get(':receiver_uuid')

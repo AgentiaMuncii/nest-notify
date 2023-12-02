@@ -1,55 +1,53 @@
 import {Injectable, NotFoundException,} from '@nestjs/common';
 import {InjectRepository} from '@nestjs/typeorm';
 import {DataSource, IsNull, Repository} from 'typeorm';
-import {Notification} from './entities/notification.entity';
-import {NotificationCreatePayloadDto} from './dto/notification-create-payload.dto';
+import {InternalNotification} from './entities/internal-notification.entity';
+import {InternalNotificationCreatePayloadDto} from './dto/internal-notification-create-payload.dto';
 import {plainToInstance} from 'class-transformer';
 import {v4 as uuidv4} from 'uuid';
 import {IPaginationOptions, paginateRaw} from 'nestjs-typeorm-paginate';
 import {
-  NotificationCreateResponseDto
-} from '@/app/modules/notification/modules/internal/dto/notification-create-response.dto';
-import {NotificationContent} from '@/app/modules/notification/modules/internal/entities/notification-content.entity';
-import {NotificationReceiver} from '@/app/modules/notification/modules/internal/entities/notification-receiver.entity';
+  InternalNotificationCreateResponseDto
+} from '@/app/modules/notification/modules/internal/dto/internal-notification-create-response.dto';
+import {InternalNotificationTranslation} from '@/app/modules/notification/modules/internal/entities/internal-notification-translation.entity';
+import {InternalNotificationReceiver} from '@/app/modules/notification/modules/internal/entities/internal-notification-receiver.entity';
 import {Language} from '@/app/enum/language.enum';
 import {
   NotificationGetOneResponseDto
 } from '@/app/modules/notification/modules/internal/dto/notification-get-one-response.dto';
-import {ChannelType} from '@/app/modules/notification/enum/channel-type.enum';
 import {EventEmitter2} from '@nestjs/event-emitter';
 
 @Injectable()
-export class NotificationInternalService {
+export class InternalNotificationService {
   constructor(
-    @InjectRepository(Notification)
-    private readonly notificationRepository: Repository<Notification>,
-    @InjectRepository(NotificationReceiver)
-    private readonly notificationReceiverRepository: Repository<NotificationReceiver>,
+    @InjectRepository(InternalNotification)
+    private readonly notificationRepository: Repository<InternalNotification>,
+    @InjectRepository(InternalNotificationReceiver)
+    private readonly notificationReceiverRepository: Repository<InternalNotificationReceiver>,
     private readonly dateSource: DataSource,
     private readonly eventEmitter: EventEmitter2
   ) {}
 
   async create(
-    notification: NotificationCreatePayloadDto
-  ): Promise<NotificationCreateResponseDto> {
-    const notificationEntity = plainToInstance(Notification, notification);
+    notification: InternalNotificationCreatePayloadDto
+  ): Promise<InternalNotificationCreateResponseDto> {
+    const notificationEntity = plainToInstance(InternalNotification, notification);
     notificationEntity.uuid = uuidv4();
-    notificationEntity.channel_type = ChannelType.Internal;
     const queryRunner = this.dateSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
-    let addedNotification: NotificationCreateResponseDto = null;
+    let addedNotification: InternalNotificationCreateResponseDto = null;
 
     try {
-      addedNotification = await queryRunner.manager.save(Notification, notificationEntity);
+      addedNotification = await queryRunner.manager.save(InternalNotification, notificationEntity);
 
-      for (const notificationContent of notificationEntity.content) {
+      for (const notificationContent of notificationEntity.translations) {
         notificationContent.notification_id = notificationEntity.id;
-        await queryRunner.manager.save(NotificationContent, notificationContent);
+        await queryRunner.manager.save(InternalNotificationTranslation, notificationContent);
       }
 
       for (const notificationReceiver of notification.receivers) {
-        const messageReceiverEntity: NotificationReceiver = {
+        const messageReceiverEntity: InternalNotificationReceiver = {
           id: null,
           notification_id: notificationEntity.id,
           receiver_uuid: notificationReceiver,
@@ -58,14 +56,14 @@ export class NotificationInternalService {
           viewed_at: null,
           confirm_view_at: null
         };
-        await queryRunner.manager.save(NotificationReceiver, messageReceiverEntity);
+        await queryRunner.manager.save(InternalNotificationReceiver, messageReceiverEntity);
       }
 
       await queryRunner.commitTransaction();
 
       this.eventEmitter.emit('notification.internal.created', {
         receivers: notification.receivers,
-        subject: notificationEntity.content[0].subject,
+        subject: notificationEntity.translations[0].subject,
         uuid: notificationEntity.uuid,
       });
 
@@ -75,7 +73,7 @@ export class NotificationInternalService {
       await queryRunner.release();
     }
 
-    return plainToInstance(NotificationCreateResponseDto ,addedNotification);
+    return plainToInstance(InternalNotificationCreateResponseDto ,addedNotification);
   }
 
   async getAllPaginated(
@@ -132,7 +130,7 @@ export class NotificationInternalService {
         .createQueryBuilder('notifications')
         .select(['notifications.uuid AS uuid', 'notifications.sender_uuid AS sender_uuid'])
         .innerJoin(
-          NotificationReceiver,
+          InternalNotificationReceiver,
           'receiver',
           'receiver.notification_id = notifications.id AND receiver.receiver_uuid = :receiver_uuid',
           {receiver_uuid: receiver_uuid}
@@ -140,7 +138,7 @@ export class NotificationInternalService {
         .addSelect('receiver.sent_at', 'sent_at')
         .addSelect('receiver.viewed_at', 'viewed_at')
         .innerJoin(
-          NotificationContent,
+          InternalNotificationTranslation,
           'content',
           'content.notification_id = notifications.id AND content.language = :language ',
           {language: this.setLanguage(language)}
@@ -169,7 +167,7 @@ export class NotificationInternalService {
         .createQueryBuilder('notifications')
         .select(['notifications.uuid AS uuid', 'notifications.sender_uuid AS sender_uuid'])
         .innerJoin(
-          NotificationReceiver,
+          InternalNotificationReceiver,
           'receiver',
           'receiver.notification_id = notifications.id AND receiver.receiver_uuid = :receiver_uuid AND receiver.viewed_at IS NULL',
           {receiver_uuid: receiver_uuid}
@@ -177,7 +175,7 @@ export class NotificationInternalService {
         .addSelect('receiver.sent_at', 'sent_at')
         //.addSelect('receiver.viewed_at', 'viewed_at')
         .innerJoin(
-          NotificationContent,
+          InternalNotificationTranslation,
           'content',
           'content.notification_id = notifications.id AND content.language = :language ',
           {language: this.setLanguage(language)}
@@ -201,7 +199,7 @@ export class NotificationInternalService {
         .createQueryBuilder('notifications')
         .select('notifications.uuid', 'uuid')
         .innerJoin(
-          NotificationContent,
+          InternalNotificationTranslation,
           'content',
           'content.notification_id = notifications.id AND content.language = :language',
           {language: this.setLanguage(language)}
@@ -210,7 +208,7 @@ export class NotificationInternalService {
         .addSelect('content.subject', 'subject')
         .addSelect('content.body', 'body')
         .innerJoin(
-          NotificationReceiver,
+          InternalNotificationReceiver,
           'receiver',
           'receiver.notification_id = notifications.id AND receiver.receiver_uuid = :receiver_uuid',
           {receiver_uuid: receiver_uuid}

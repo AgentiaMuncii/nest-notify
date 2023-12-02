@@ -6,7 +6,7 @@ import {
   Res,
 } from '@nestjs/common';
 import { Response } from 'express';
-import { NotificationInternalService } from './notification-internal.service';
+import { InternalNotificationService } from './internal-notification.service';
 import {
   ApiOkResponse,
   ApiOperation, ApiParam, ApiQuery,
@@ -15,27 +15,27 @@ import {
 
 import {SortOrder} from '@/database/validators/typeorm.sort.validator';
 import PaginatorConfigInterface from '@/database/interfaces/paginator-config.interface';
-import {NotificationCreatePayloadDto} from '@/app/modules/notification/modules/internal/dto/notification-create-payload.dto';
-import {NotificationSortColumn} from '@/app/modules/notification/modules/internal/validators/message-sort-column.validator';
+import {InternalNotificationCreatePayloadDto} from '@/app/modules/notification/modules/internal/dto/internal-notification-create-payload.dto';
+import {NotificationSortColumn} from '@/app/modules/notification/modules/internal/validators/notification-sort-column.validator';
 import {NotificationGetResponseDto} from '@/app/modules/notification/modules/internal/dto/notification-get-response.dto';
 
 @ApiTags('Notifications Internal CRUD')
 @Controller('notifications/internal')
 
-export class NotificationInternalCrudController {
+export class InternalNotificationCrudController {
   constructor(
-    private readonly messageService: NotificationInternalService
+    private readonly messageService: InternalNotificationService
   ) {}
 
   @Post()
   @ApiOperation({ summary: 'Create new internal notification' })
   @ApiOkResponse({
     description: 'Created notification',
-    type: NotificationCreatePayloadDto,
+    type: InternalNotificationCreatePayloadDto,
     isArray: true,
   })
   async create(
-    @Body() notificationCreatePayloadDto: NotificationCreatePayloadDto,
+    @Body() notificationCreatePayloadDto: InternalNotificationCreatePayloadDto,
     @Res() response: Response,
   ) {
     response

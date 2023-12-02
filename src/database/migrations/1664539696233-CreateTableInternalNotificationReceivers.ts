@@ -1,11 +1,11 @@
 import {MigrationInterface, QueryRunner, Table, TableForeignKey} from 'typeorm';
 
-export class CreateTableNotificationReceivers1664539696233 implements MigrationInterface {
+export class CreateTableInternalNotificationReceivers1664539696233 implements MigrationInterface {
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
-        name: 'notification_receivers',
+        name: 'internal_notification_receivers',
         columns: [
           {
             name: 'id',
@@ -49,11 +49,11 @@ export class CreateTableNotificationReceivers1664539696233 implements MigrationI
     );
 
     await queryRunner.createForeignKey(
-      'notification_receivers',
+      'internal_notification_receivers',
       new TableForeignKey({
-        name: 'notification_receiver_fk',
+        name: 'internal_notification_receiver_fk',
         columnNames: ['notification_id'],
-        referencedTableName: 'notifications',
+        referencedTableName: 'internal_notifications',
         referencedColumnNames: ['id'],
         onDelete: 'CASCADE',
       }),
@@ -61,7 +61,7 @@ export class CreateTableNotificationReceivers1664539696233 implements MigrationI
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropTable('notification_receivers');
-    await queryRunner.dropForeignKey('notification_receivers', 'notification_receiver_fk');
+    await queryRunner.dropTable('internal_notification_receivers');
+    await queryRunner.dropForeignKey('internal_notification_receivers', 'internal_notification_receiver_fk');
   }
 }

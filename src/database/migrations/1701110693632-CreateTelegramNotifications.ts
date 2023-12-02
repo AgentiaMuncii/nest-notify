@@ -1,12 +1,12 @@
-import {MigrationInterface, QueryRunner, Table} from 'typeorm';
+import {MigrationInterface, QueryRunner, Table, TableForeignKey} from 'typeorm';
 import {Language} from '@/app/enum/language.enum';
 
-export class CreateTableMailNotifications1701452023951 implements MigrationInterface {
+export class CreateTelegramNotifications1701110693633 implements MigrationInterface {
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
-        name: 'mail_notifications',
+        name: 'telegram_notifications',
         columns: [
           {
             name: 'id',
@@ -17,9 +17,8 @@ export class CreateTableMailNotifications1701452023951 implements MigrationInter
             isNullable: false,
           },
           {
-            name: 'receiver_email',
-            type: 'varchar',
-            length: '255',
+            name: 'receiver_id',
+            type: 'int',
             isNullable: false,
           },
           {
@@ -68,10 +67,21 @@ export class CreateTableMailNotifications1701452023951 implements MigrationInter
       }),
       true,
     );
+
+    await queryRunner.createForeignKey(
+      'telegram_notifications',
+      new TableForeignKey({
+        name: 'telegram_notification_receiver_fk',
+        columnNames: ['receiver_id'],
+        referencedColumnNames: ['id'],
+        referencedTableName: 'telegram_notification_receivers',
+        onDelete: 'CASCADE',
+      }),
+    );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropTable('mail_notifications');
+    await queryRunner.dropTable('telegram_notifications');
+    await queryRunner.dropForeignKey('telegram_notifications', 'telegram_notification_receiver_fk');
   }
-
 }

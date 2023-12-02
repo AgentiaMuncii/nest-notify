@@ -1,25 +1,24 @@
-import {NotificationInternalService} from './notification-internal.service';
+import {InternalNotificationService} from './internal-notification.service';
 import {Test, TestingModule} from '@nestjs/testing';
 import {DataSource, IsNull, Repository} from 'typeorm';
-import {NotificationReceiver} from './entities/notification-receiver.entity';
-import {Notification} from './entities/notification.entity';
+import {InternalNotificationReceiver} from './entities/internal-notification-receiver.entity';
+import {InternalNotification} from './entities/internal-notification.entity';
 import {EventEmitter2} from '@nestjs/event-emitter';
 import {getRepositoryToken} from '@nestjs/typeorm';
-import {ChannelType} from '@/app/modules/notification/enum/channel-type.enum';
 import {InternalServerErrorException, NotFoundException} from '@nestjs/common';
 
 describe('NotificationInternalService', () => {
-  let notificationInternalService: NotificationInternalService;
+  let notificationInternalService: InternalNotificationService;
 
-  let notificationReceiverRepository: Repository<NotificationReceiver>;
-  let notificationRepository: Repository<Notification>;
+  let notificationReceiverRepository: Repository<InternalNotificationReceiver>;
+  let notificationRepository: Repository<InternalNotification>;
   let dataSourceMock: DataSource;
   let eventEmmiter: EventEmitter2;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        NotificationInternalService,
+        InternalNotificationService,
         {
           provide: EventEmitter2,
           useValue: jest.fn()
@@ -29,14 +28,14 @@ describe('NotificationInternalService', () => {
           useValue: jest.fn()
         },
         {
-          provide: getRepositoryToken(Notification),
+          provide: getRepositoryToken(InternalNotification),
           useValue: {
             findAndCount: jest.fn(),
             findOneOrFail: jest.fn(),
           }
         },
         {
-          provide: getRepositoryToken(NotificationReceiver),
+          provide: getRepositoryToken(InternalNotificationReceiver),
           useValue: {
             findAndCount: jest.fn(),
             findOneOrFail: jest.fn(),
@@ -48,10 +47,10 @@ describe('NotificationInternalService', () => {
 
     eventEmmiter = module.get(EventEmitter2);
     dataSourceMock = module.get(DataSource);
-    notificationReceiverRepository = module.get(getRepositoryToken(NotificationReceiver));
-    notificationRepository = module.get(getRepositoryToken(Notification));
+    notificationReceiverRepository = module.get(getRepositoryToken(InternalNotificationReceiver));
+    notificationRepository = module.get(getRepositoryToken(InternalNotification));
 
-    notificationInternalService = module.get(NotificationInternalService);
+    notificationInternalService = module.get(InternalNotificationService);
   });
 
   it('should be defined', () => {
@@ -77,8 +76,7 @@ describe('NotificationInternalService', () => {
         id: 0,
         uuid: 'uuid',
         sender_uuid: 'sender-uuid',
-        created_at: '2022-01-01',
-        channel_type: ChannelType.Internal,
+        created_at: '2022-01-01'
       };
 
       findNotificationSpy.mockReturnValueOnce(Promise.resolve(notificationMock as any));

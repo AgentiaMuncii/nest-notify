@@ -1,11 +1,11 @@
 import {Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn} from 'typeorm';
 import {Language} from '@/app/enum/language.enum';
-import {Notification} from '@/app/modules/notification/modules/internal/entities/notification.entity';
+import {InternalNotification} from '@/app/modules/notification/modules/internal/entities/internal-notification.entity';
 
 @Entity({
-  name: 'notification_content',
+  name: 'internal_notification_content',
 })
-export class NotificationContent {
+export class InternalNotificationTranslation {
     @PrimaryGeneratedColumn()
       id: number;
     
@@ -34,7 +34,7 @@ export class NotificationContent {
     })
       body: string;
 
-    @ManyToOne(() => Notification, (notification) => notification.content)
+    @ManyToOne(() => InternalNotification, (notification) => notification.translations)
     @JoinColumn({name: 'notification_id'})
-      notification: Notification;
+      notification: InternalNotification;
 }

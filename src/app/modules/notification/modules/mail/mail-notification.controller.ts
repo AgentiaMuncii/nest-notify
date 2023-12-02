@@ -1,13 +1,13 @@
 import {Body, Controller, Post} from '@nestjs/common';
-import {NotificationMailService} from '@/app/modules/notification/modules/mail/notification-mail.service';
+import {MailNotificationService} from '@/app/modules/notification/modules/mail/mail-notification.service';
 import {
   MailNotificationCreatePayloadDto
 } from '@/app/modules/notification/modules/mail/dto/mail-notification-create-payload.dto';
 
 @Controller('notifications/mail')
-export class NotificationMailController {
+export class MailNotificationController {
   constructor(
-        private readonly notificationService: NotificationMailService
+        private readonly notificationService: MailNotificationService
   ) {
   }
 

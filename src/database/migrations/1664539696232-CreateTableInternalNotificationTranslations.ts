@@ -1,12 +1,12 @@
 import {MigrationInterface, QueryRunner, Table, TableForeignKey} from 'typeorm';
 import {Language} from '@/app/enum/language.enum';
 
-export class CreateTableNotificationContent1664539696232 implements MigrationInterface {
+export class CreateTableNotificationTranslations1664539696232 implements MigrationInterface {
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
-        name: 'notification_content',
+        name: 'internal_notification_translations',
         columns: [
           {
             name: 'id',
@@ -51,11 +51,11 @@ export class CreateTableNotificationContent1664539696232 implements MigrationInt
     );
 
     await queryRunner.createForeignKey(
-      'notification_content',
+      'internal_notification_translations',
       new TableForeignKey({
-        name: 'notification_content_fk',
+        name: 'internal_notification_translation_fk',
         columnNames: ['notification_id'],
-        referencedTableName: 'notifications',
+        referencedTableName: 'internal_notifications',
         referencedColumnNames: ['id'],
         onDelete: 'CASCADE',
       }),
@@ -63,7 +63,7 @@ export class CreateTableNotificationContent1664539696232 implements MigrationInt
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropTable('notification_content');
-    await queryRunner.dropForeignKey('notification_content', 'notification_content_fk');
+    await queryRunner.dropTable('internal_notification_translations');
+    await queryRunner.dropForeignKey('internal_notification_translations', 'internal_notification_translation_fk');
   }
 }

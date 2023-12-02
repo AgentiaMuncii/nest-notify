@@ -1,12 +1,12 @@
 import {MigrationInterface, QueryRunner, Table} from 'typeorm';
 import {Language} from '@/app/enum/language.enum';
 
-export class CreateTelegramReceiversMatching1701110693633 implements MigrationInterface {
+export class CreateTelegramNotificationReceivers1701110693631 implements MigrationInterface {
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
-        name: 'telegram_receivers_matching',
+        name: 'telegram_notification_receivers',
         columns: [
           {
             name: 'id',
@@ -26,7 +26,7 @@ export class CreateTelegramReceiversMatching1701110693633 implements MigrationIn
           {
             name: 'chat_id',
             type: 'int',
-            isNullable: false,
+            isNullable: true,
             isUnique: true,
           },
           {
@@ -46,13 +46,18 @@ export class CreateTelegramReceiversMatching1701110693633 implements MigrationIn
             isNullable: false,
             default: 'CURRENT_TIMESTAMP',
           },
+          {
+            name: 'confirmed_at',
+            type: 'timestamp',
+            isNullable: true
+          }
         ],
       })
     );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropTable('telegram_receivers_matching');
+    await queryRunner.dropTable('telegram_notification_receivers');
   }
 
 }

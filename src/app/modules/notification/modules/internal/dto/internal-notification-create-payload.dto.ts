@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import {IsArray, Length} from 'class-validator';
 import {Language} from '@/app/enum/language.enum';
 
-export class NotificationContentDto {
+export class NotificationTranslationDto {
     @ApiProperty({ example: 'en', description: 'Language' })
       language: Language;
 
@@ -12,7 +12,7 @@ export class NotificationContentDto {
     @ApiProperty({ example: 'Body', description: 'Body' })
       body: string;
 }
-export class NotificationCreatePayloadDto {
+export class InternalNotificationCreatePayloadDto {
   @ApiProperty({ example: '74326f56-16ca-49dd-9679-deb992d5534d', description: 'Sender Uuid' })
   @Length(36, 36,{
     message: 'Sender Uuid must contain $constraint1 characters',
@@ -21,11 +21,11 @@ export class NotificationCreatePayloadDto {
 
   @ApiProperty({
     example: '',
-    description: 'Notification content',
-    name: 'content'
+    description: 'Notification translations',
+    name: 'translations'
   })
   @IsArray()
-    content: NotificationContentDto[];
+    translations: NotificationTranslationDto[];
   @ApiProperty({
     example: '',
     description: 'Notification receivers',

@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {IsArray, IsEmail, IsString, IsUUID} from 'class-validator';
+import {Language} from '@/app/enum/language.enum';
 
 export class MailNotificationCreatePayloadDto {
   @ApiProperty({ example: '74326f56-16ca-49dd-9679-deb992d5534d', description: 'Sender Uuid' })
@@ -13,6 +14,9 @@ export class MailNotificationCreatePayloadDto {
   @ApiProperty({ example: 'Body', description: 'Body' })
     @IsString()
     body: string;
+
+  @ApiProperty({ example: 'en', description: 'Language' })
+    language: Language;
   
   @ApiProperty({
     example: '',

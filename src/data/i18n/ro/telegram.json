@@ -3,6 +3,7 @@
     "start": {
       "welcome_message": "Bine ati venit {subscriberName}! Ati fost abonat cu succes la {botName}.",
       "already_subscribed": "Deja sunteti abonat la acest bot!",
+      "subscriber_not_found": "Subscriber-ul nu a fost gasit!",
       "error": "Eroare! Incercati mai tirziu sau contactati administratorul."
     },
     "on_message": {

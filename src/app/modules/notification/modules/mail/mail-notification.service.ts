@@ -5,12 +5,11 @@ import {
 import {InjectRepository} from '@nestjs/typeorm';
 import {DataSource, IsNull, LessThan, Repository} from 'typeorm';
 import {MailNotification} from '@/app/modules/notification/modules/mail/entities/mail-notification.entity';
-import {Cron} from '@nestjs/schedule';
 import {MailerService} from '@nestjs-modules/mailer';
 import AppConfig from '@/config/app-config';
 
 @Injectable()
-export class NotificationMailService {
+export class MailNotificationService {
   
   constructor(
       @InjectRepository(MailNotification)
@@ -54,7 +53,7 @@ export class NotificationMailService {
     });
   }
 
-  @Cron(AppConfig.mail.cronTimeout)
+  // @Cron(AppConfig.mail.cronTimeout)
   async sendNotification() {
     console.log('sendNotification', new Date().toISOString());
     const sentNotifications = [];

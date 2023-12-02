@@ -1,10 +1,10 @@
 import {Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn} from 'typeorm';
-import {Notification} from '@/app/modules/notification/modules/internal/entities/notification.entity';
+import {InternalNotification} from '@/app/modules/notification/modules/internal/entities/internal-notification.entity';
 
 @Entity({
-  name: 'notification_receivers',
+  name: 'internal_notification_receivers',
 })
-export class NotificationReceiver {
+export class InternalNotificationReceiver {
     @PrimaryGeneratedColumn()
       id: number;
     
@@ -39,9 +39,9 @@ export class NotificationReceiver {
     })
       confirm_view_at: Date;
 
-    @ManyToOne(() => Notification, (notification) => notification.receivers)
+    @ManyToOne(() => InternalNotification, (notification) => notification.receivers)
     @JoinColumn({name: 'notification_id'})
-      notification: Notification;
+      notification: InternalNotification;
 
 
 }
