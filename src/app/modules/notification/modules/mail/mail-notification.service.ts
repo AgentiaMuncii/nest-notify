@@ -3,10 +3,13 @@ import {
   MailNotificationCreatePayloadDto
 } from '@/app/modules/notification/modules/mail/dto/mail-notification-create-payload.dto';
 import {InjectRepository} from '@nestjs/typeorm';
-import {DataSource, IsNull, LessThan, Repository} from 'typeorm';
+import {DataSource, IsNull, LessThanOrEqual, Repository} from 'typeorm';
 import {MailNotification} from '@/app/modules/notification/modules/mail/entities/mail-notification.entity';
 import {MailerService} from '@nestjs-modules/mailer';
 import AppConfig from '@/config/app-config';
+import {Language} from '@/app/enum/language.enum';
+import {Cron} from '@nestjs/schedule';
+import {isEmail} from 'class-validator';
 
 @Injectable()
 export class MailNotificationService {
@@ -29,6 +32,7 @@ export class MailNotificationService {
         newNotification.receiver_email = email;
         newNotification.subject = notification.subject;
         newNotification.body = notification.body;
+        newNotification.language = notification.language || Language.EN;
         createdNotifications.push(await queryRunner.manager.save(newNotification));
       }
       await queryRunner.commitTransaction();
@@ -44,7 +48,7 @@ export class MailNotificationService {
     return this.notificationRepository.find({
       where: {
         sent_at: IsNull(),
-        retry_attempts: LessThan(AppConfig.mail.retryAttempts)
+        retry_attempts: LessThanOrEqual(AppConfig.mail.retryAttempts)
       },
       order: {
         created_at: 'ASC',
@@ -53,7 +57,7 @@ export class MailNotificationService {
     });
   }
 
-  // @Cron(AppConfig.mail.cronTimeout)
+  @Cron(AppConfig.mail.cronTimeout)
   async sendNotification() {
     console.log('sendNotification', new Date().toISOString());
     const sentNotifications = [];
@@ -61,17 +65,20 @@ export class MailNotificationService {
     try {
       const notificationsToBeSent = await this.getUnsentNotifications();
       for (const mailNotification of notificationsToBeSent) {
-        mailNotification.sent_at = new Date();
+
         mailNotification.retry_attempts += 1;
 
-        const sendResponse = await this.mailerService.sendMail({
-          to: mailNotification.receiver_email,
-          subject: mailNotification.subject,
-          text: mailNotification.body,
-          html: mailNotification.body
-        });
+        if(isEmail(mailNotification.receiver_email)){
+          mailNotification.sent_at = new Date();
+          const sendResponse = await this.mailerService.sendMail({
+            to: mailNotification.receiver_email,
+            subject: mailNotification.subject,
+            text: mailNotification.body,
+            html: mailNotification.body
+          });
 
-        console.log('sendResponse', sendResponse);
+          console.log('sendResponse', sendResponse);
+        }
 
         await this.notificationRepository.save(mailNotification);
         sentNotifications.push(mailNotification);

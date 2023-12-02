@@ -4,6 +4,6 @@ dist
 /uploads/
 /pgdata/
 /ormlogs.log
-.env.backup
 .env
+.env.backup
 .idea

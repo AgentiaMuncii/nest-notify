@@ -3,8 +3,10 @@ import {MailNotificationService} from '@/app/modules/notification/modules/mail/m
 import {
   MailNotificationCreatePayloadDto
 } from '@/app/modules/notification/modules/mail/dto/mail-notification-create-payload.dto';
+import {ApiTags} from '@nestjs/swagger';
 
 @Controller('notifications/mail')
+@ApiTags('Notifications Mail')
 export class MailNotificationController {
   constructor(
         private readonly notificationService: MailNotificationService
