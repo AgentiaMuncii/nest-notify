@@ -1,4 +1,4 @@
-import {ConflictException, Injectable} from '@nestjs/common';
+import {ConflictException, Injectable, NotFoundException} from '@nestjs/common';
 import { Telegraf } from 'telegraf';
 import {
   TelegramNotificationCreatePayloadDto
@@ -35,7 +35,9 @@ export class TelegramNotificationService {
       }
     });
     if (existingSubscriber) {
-      throw new ConflictException();
+      throw new ConflictException({
+        code: 'SUBSCRIBER_ALREADY_EXISTS',
+      });
     }
     try {
       const subscriberEntity = new TelegramNotificationReceiver();
@@ -85,6 +87,12 @@ export class TelegramNotificationService {
       await queryRunner.rollbackTransaction();
     } finally {
       await queryRunner.release();
+    }
+
+    if (!createdNotifications.length) {
+      throw new NotFoundException({
+        code: 'NO_RECEIVERS_FOUND',
+      });
     }
 
     return createdNotifications;

@@ -3,7 +3,7 @@ import {Language} from '@/app/enum/language.enum';
 import {InternalNotification} from '@/app/modules/notification/modules/internal/entities/internal-notification.entity';
 
 @Entity({
-  name: 'internal_notification_content',
+  name: 'internal_notification_translations',
 })
 export class InternalNotificationTranslation {
     @PrimaryGeneratedColumn()

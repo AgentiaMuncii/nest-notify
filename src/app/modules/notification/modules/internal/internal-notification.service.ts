@@ -36,6 +36,7 @@ export class InternalNotificationService {
     const queryRunner = this.dateSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
+
     let addedNotification: InternalNotificationCreateResponseDto = null;
 
     try {
