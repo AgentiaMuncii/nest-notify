@@ -2,7 +2,7 @@ import {Scenes, Telegraf} from 'telegraf';
 import {Ctx, Message, On, Start, Update} from 'nestjs-telegraf';
 import {
   TelegramNotificationReceiver
-} from '@/app/modules/notification/modules/telegram/entities/telegram-notification.receiver';
+} from '@/app/modules/notification/modules/telegram/entities/telegram-notification-receiver.entity';
 import {Repository} from 'typeorm';
 import AppConfig from '@/config/app-config';
 import {Language} from '@/app/enum/language.enum';

@@ -71,7 +71,7 @@ export class CreateTelegramNotifications1701110693633 implements MigrationInterf
     await queryRunner.createForeignKey(
       'telegram_notifications',
       new TableForeignKey({
-        name: 'telegram_notification_receiver_fk',
+        name: 'telegram_notification_receivers',
         columnNames: ['receiver_id'],
         referencedColumnNames: ['id'],
         referencedTableName: 'telegram_notification_receivers',
@@ -82,6 +82,6 @@ export class CreateTelegramNotifications1701110693633 implements MigrationInterf
 
   public async down(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.dropTable('telegram_notifications');
-    await queryRunner.dropForeignKey('telegram_notifications', 'telegram_notification_receiver_fk');
+    await queryRunner.dropForeignKey('telegram_notifications', 'telegram_notification_receivers');
   }
 }

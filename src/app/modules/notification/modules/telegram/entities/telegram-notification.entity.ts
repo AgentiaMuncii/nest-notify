@@ -1,8 +1,8 @@
-import {Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn} from 'typeorm';
+import {Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn} from 'typeorm';
 import {Language} from '@/app/enum/language.enum';
 import {
   TelegramNotificationReceiver
-} from '@/app/modules/notification/modules/telegram/entities/telegram-notification.receiver';
+} from '@/app/modules/notification/modules/telegram/entities/telegram-notification-receiver.entity';
 
 @Entity({
   name: 'telegram_notifications'
@@ -10,11 +10,6 @@ import {
 export class TelegramNotification {
   @PrimaryGeneratedColumn()
     id: number;
-
-  @Column({
-    nullable: false,
-  })
-    receiver_id: number;
 
   @Column({
     length: 255,
@@ -56,7 +51,11 @@ export class TelegramNotification {
   })
     viewed_at: Date;
 
-  @ManyToOne(() => TelegramNotificationReceiver, (receiver) => receiver.notifications)
-  @JoinColumn({name: 'receiver_id'})
+  @Column({
+    nullable: false,
+  })
+    receiver_id: number;
+
+  @ManyToOne(() => TelegramNotificationReceiver, (notificationReceiver) => notificationReceiver.notifications)
     receiver: TelegramNotificationReceiver;
 }

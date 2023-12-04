@@ -7,7 +7,7 @@ import AppConfig from '@/config/app-config';
 import {DataSource, IsNull, LessThan, Repository} from 'typeorm';
 import {
   TelegramNotificationReceiver
-} from '@/app/modules/notification/modules/telegram/entities/telegram-notification.receiver';
+} from '@/app/modules/notification/modules/telegram/entities/telegram-notification-receiver.entity';
 import {InjectRepository} from '@nestjs/typeorm';
 import {TelegramNotification} from '@/app/modules/notification/modules/telegram/entities/telegram-notification.entity';
 import {

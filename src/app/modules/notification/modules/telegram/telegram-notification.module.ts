@@ -9,7 +9,7 @@ import AppConfig from '@/config/app-config';
 import {TypeOrmModule} from '@nestjs/typeorm';
 import {
   TelegramNotificationReceiver
-} from '@/app/modules/notification/modules/telegram/entities/telegram-notification.receiver';
+} from '@/app/modules/notification/modules/telegram/entities/telegram-notification-receiver.entity';
 import {TelegramNotification} from '@/app/modules/notification/modules/telegram/entities/telegram-notification.entity';
 
 @Module({
