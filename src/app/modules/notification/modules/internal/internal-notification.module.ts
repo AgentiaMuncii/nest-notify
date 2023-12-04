@@ -9,17 +9,13 @@ import {
   InternalNotificationReceiverController
 } from '@/app/modules/notification/modules/internal/internal-notification-receiver.controller';
 import {EventsGateway} from '@/app/services/events-gateway/events.gateway';
-import {
-  InternalNotificationEventsController
-} from '@/app/modules/notification/modules/internal/internal-notification-events.controller';
 
 @Module({
   imports: [TypeOrmModule.forFeature([InternalNotification, InternalNotificationTranslation, InternalNotificationReceiver])],
   exports: [TypeOrmModule, InternalNotificationService],
   controllers: [
     InternalNotificationCrudController,
-    InternalNotificationReceiverController,
-    InternalNotificationEventsController
+    InternalNotificationReceiverController
   ],
   providers: [
     InternalNotificationService,

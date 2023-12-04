@@ -15,7 +15,7 @@ import {Language} from '@/app/enum/language.enum';
 import {
   NotificationGetOneResponseDto
 } from '@/app/modules/notification/modules/internal/dto/notification-get-one-response.dto';
-import {EventEmitter2} from '@nestjs/event-emitter';
+import {EventsGateway} from '@/app/services/events-gateway/events.gateway';
 
 @Injectable()
 export class InternalNotificationService {
@@ -25,7 +25,7 @@ export class InternalNotificationService {
     @InjectRepository(InternalNotificationReceiver)
     private readonly notificationReceiverRepository: Repository<InternalNotificationReceiver>,
     private readonly dateSource: DataSource,
-    private readonly eventEmitter: EventEmitter2
+    private readonly eventsGateway: EventsGateway
   ) {}
 
   async create(
@@ -42,9 +42,9 @@ export class InternalNotificationService {
     try {
       addedNotification = await queryRunner.manager.save(InternalNotification, notificationEntity);
 
-      for (const notificationContent of notificationEntity.translations) {
-        notificationContent.notification_id = notificationEntity.id;
-        await queryRunner.manager.save(InternalNotificationTranslation, notificationContent);
+      for (const notificationTranslation of notificationEntity.translations) {
+        notificationTranslation.notification_id = notificationEntity.id;
+        await queryRunner.manager.save(InternalNotificationTranslation, notificationTranslation);
       }
 
       for (const notificationReceiver of notification.receivers) {
@@ -57,21 +57,31 @@ export class InternalNotificationService {
           viewed_at: null,
           confirm_view_at: null
         };
+
+        this.emitEventNotificationCreated({
+          receiver: notificationReceiver,
+          uuid: notificationEntity.uuid,
+          translations: notificationEntity.translations.map(translation => {
+            return {
+              language: translation.language,
+              subject: translation.subject
+            };
+          }),
+        });
+
         await queryRunner.manager.save(InternalNotificationReceiver, messageReceiverEntity);
       }
 
       await queryRunner.commitTransaction();
 
-      this.eventEmitter.emit('notification.internal.created', {
-        receivers: notification.receivers,
-        subject: notificationEntity.translations[0].subject,
-        uuid: notificationEntity.uuid,
-      });
-
     } catch (e) {
       await queryRunner.rollbackTransaction();
     } finally {
       await queryRunner.release();
+    }
+
+    for (const notificationReceiver of notification.receivers){
+      await this.emitEventUnreadCounter(notificationReceiver);
     }
 
     return plainToInstance(InternalNotificationCreateResponseDto ,addedNotification);
@@ -235,6 +245,9 @@ export class InternalNotificationService {
         await this.notificationReceiverRepository.save(notificationReceiver);
       }
 
+      await this.emitEventUnreadCounter(receiver_uuid);
+      console.log('I AM HERE');
+
       return plainToInstance(NotificationGetOneResponseDto, notification);
     } catch (e) {
       console.log(e);
@@ -321,7 +334,20 @@ export class InternalNotificationService {
     return 'EN';
   }
 
+  private async emitEventUnreadCounter(receiver_uuid: string) {
+    const response = await this.getUnreadCountByReceiver(receiver_uuid);
+    this.eventsGateway.server.emit('notification.internal.unread-count', {
+      receiver: receiver_uuid,
+      count: response.count
+    });
+  }
+
+  private emitEventNotificationCreated(notification: any) {
+    this.eventsGateway.server.emit('notification.internal.created', notification);
+  }
+
   async truncate() {
     await this.notificationRepository.query('TRUNCATE TABLE messages CASCADE;');
   }
+
 }
