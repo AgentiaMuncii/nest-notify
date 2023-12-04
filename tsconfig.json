@@ -1,4 +1,5 @@
 {
+  "useDefineForClassFields": true,
   "compilerOptions": {
     "module": "commonjs",
     "declaration": true,
@@ -19,6 +20,7 @@
     "noFallthroughCasesInSwitch": false,
     "esModuleInterop": true,
     "resolveJsonModule": true,
+    "useDefineForClassFields": true,
     "paths": {
       "@/*": [
         "src/*"
