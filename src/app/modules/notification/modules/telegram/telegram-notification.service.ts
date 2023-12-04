@@ -123,7 +123,7 @@ export class TelegramNotificationService {
   }
 
   @Cron(CronExpression.EVERY_DAY_AT_2AM)
-  private async deleteOldSentNotifications() {
+  async deleteOldSentNotifications() {
     const days = 7;
     await this.telegramNotificationRepository.delete({
       sent_at: LessThan(new Date(new Date().setDate(new Date().getDate() - days)))

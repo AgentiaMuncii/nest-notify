@@ -5,8 +5,9 @@ import {
 } from '@/app/modules/notification/modules/discord/dto/discord-notification-create-payload.dto';
 import {InjectRepository} from '@nestjs/typeorm';
 import {DiscordNotification} from '@/app/modules/notification/modules/discord/entities/discord-notification.entity';
-import {Repository} from 'typeorm';
+import {IsNull, LessThan, Repository} from 'typeorm';
 import {Language} from '@/app/enum/language.enum';
+import {Cron, CronExpression} from '@nestjs/schedule';
 
 @Injectable()
 export class DiscordNotificationService {
@@ -56,4 +57,22 @@ export class DiscordNotificationService {
       console.log(e);
     }
   }
+
+  @Cron(CronExpression.EVERY_DAY_AT_2AM)
+  deleteOldNotifications() {
+    const days = 7;
+    return this.discordNotificationRepository.delete({
+      sent_at: LessThan(new Date(new Date().setDate(new Date().getDate() - days)))
+    });
+  }
+
+  @Cron(CronExpression.EVERY_WEEK)
+  async deleteOldUnsentNotifications() {
+    const days = 30;
+    await this.discordNotificationRepository.delete({
+      sent_at: IsNull(),
+      created_at: LessThan(new Date(new Date().setDate(new Date().getDate() - days)))
+    });
+  }
+
 }
