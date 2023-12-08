@@ -1,0 +1,73 @@
+name: "[DEV] Deploy am-dev-nest-notify"
+on:
+  push:
+    branches:
+      - dev
+  workflow_dispatch:
+
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out
+        uses: actions/checkout@v3
+        
+      - name: Login to Github Packages
+        uses: docker/login-action@v2
+        with:
+          registry: docker.pkg.github.com
+          username: ${{ secrets.admin_login }}
+          password: ${{ secrets.admin_token }}  
+
+      - name: Add .env file
+        shell: bash
+        env:
+          ENV_CONTENT: ${{ vars.dev_env }}
+          VERSION: main
+        run: echo "$ENV_CONTENT" > .env
+        
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v3
+        with:
+          node-version: lts/-1
+
+      - uses: actions/cache@v3
+        id: cache
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-${{ hashFiles('package.json') }}
+
+      - name: Set environment variables
+        run: echo "REP_NAME=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build dist
+        run: npm run build
+
+      - name: Build image and push to GitHub Packages
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: ./docker/dev/Dockerfile
+          tags: "docker.pkg.github.com/${{ env.REP_NAME }}/ui:dev"
+          push: ${{ github.ref == 'refs/heads/dev' }}
+
+      - name: Set up key
+        run: |
+          set -eu
+          mkdir "$HOME/.ssh"
+          echo "${{ secrets.key }}" > "$HOME/.ssh/key"
+          chmod 600 "$HOME/.ssh/key"           
+         
+      - name: Sync files
+        shell: bash
+        env:
+          USER: ${{ vars.dev_user }}
+          HOST: ${{ vars.dev_host }}
+          DIST: ${{ vars.dev_dist }}
+        run: |
+          rsync -e "ssh -i $HOME/.ssh/key -o StrictHostKeyChecking=no" -avz ./.env $USER@$HOST:$DIST/.env
+          ssh -i $HOME/.ssh/key -o StrictHostKeyChecking=no $USER@$HOST "cd $DIST && docker-compose pull && docker-compose up -d"
